@@ -1,0 +1,17 @@
+apiVersion: ipam.nddr.yndd.io/v1alpha1
+kind: Register
+metadata:
+  name: default.default.alloc-link-isl1
+  namespace: nokia
+spec:
+  register:
+    selector:
+    - key: purpose
+      value: isl
+    - key: address-family
+      value: ipv4
+    source-tag:
+    - key: leaf1
+      value: lag-50
+    - key: leaf2
+      value: lag-50
