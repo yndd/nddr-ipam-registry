@@ -81,7 +81,11 @@ func (e *EnqueueRequestForAllRegisters) add(obj runtime.Object, queue adder) {
 
 	for _, ipp := range d.GetIpPrefixes() {
 		// only enqueue if the org and/or deployment name match
-		if ipp.GetNamespace() == dd.GetNamespace() {
+		if ipp.GetOrganization() == dd.GetOrganization() &&
+			ipp.GetDeployment() == dd.GetDeployment() &&
+			ipp.GetIpamName() == dd.GetIpamName() &&
+			ipp.GetNetworkInstanceName() == dd.GetNetworkInstanceName() {
+
 			crName := getCrName(ipp)
 			e.handler.ResetSpeedy(crName)
 

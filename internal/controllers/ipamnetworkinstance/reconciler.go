@@ -219,9 +219,11 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.In) (m
 	r.handler.Init(crName)
 	// update status based on a scan of the pool
 
-	cr.SetOrganizationName(cr.GetOrganizationName())
-	cr.SetDeploymentName(cr.GetDeploymentName())
+	cr.SetOrganization(cr.GetOrganization())
+	cr.SetDeployment(cr.GetDeployment())
+	cr.SetAvailabilityZone(cr.GetAvailabilityZone())
 	cr.SetIpamName(cr.GetIpamName())
+	cr.SetNetworkInstanceName(cr.GetNetworkInstanceName())
 
 	// trick to use speedy for fast updates
 	return map[string]string{"dummy": "dummy"}, nil

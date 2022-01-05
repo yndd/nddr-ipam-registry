@@ -189,11 +189,12 @@ func (r *application) Delete(ctx context.Context, mg resource.Managed) (bool, er
 	log.Debug("handleDelete")
 
 	registerInfo := &handler.RegisterInfo{
-		Namespace:    cr.GetNamespace(),
-		RegistryName: cr.GetIpamName(),
-		RegisterName: cr.GetName(),
-		CrName:       getCrName(cr),
-		IpPrefix:     cr.GetIpPrefix(),
+		Namespace:           cr.GetNamespace(),
+		RegistryName:        cr.GetIpamName(),
+		Name:                cr.GetName(),
+		NetworkInstanceName: cr.GetNetworkInstanceName(),
+		CrName:              getCrName(cr),
+		IpPrefix:            cr.GetIpPrefix(),
 	}
 
 	log.Debug("resource dealloc", "registerInfo", registerInfo)
@@ -218,12 +219,11 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.Ipp) (
 	log := r.log.WithValues("function", "handleAppLogic", "crname", cr.GetName())
 	log.Debug("handleAppLogic")
 
-	//organizationName := cr.GetOrganizationName()
-	// get the deployment
+	// get the ni
 	ni := r.newIpamNetworkInstance()
 	if err := r.client.Get(ctx, types.NamespacedName{
 		Namespace: cr.GetNamespace(),
-		Name:      strings.Join([]string{cr.GetIpamName(), cr.GetNetworkInstanceName()}, "."),
+		Name:      cr.GetNetworkInstanceName(),
 	}, ni); err != nil {
 		// can happen when the deployment is not found
 		cr.SetStatus("down")
@@ -240,8 +240,9 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.Ipp) (
 		return nil, err
 	}
 
-	cr.SetOrganizationName(cr.GetOrganizationName())
-	cr.SetDeploymentName(cr.GetDeploymentName())
+	cr.SetOrganization(cr.GetOrganization())
+	cr.SetDeployment(cr.GetDeployment())
+	cr.SetAvailabilityZone(cr.GetAvailabilityZone())
 	cr.SetIpamName(cr.GetIpamName())
 	cr.SetNetworkInstanceName(cr.GetNetworkInstanceName())
 	cr.SetStatus("up")

@@ -1,9 +1,14 @@
 apiVersion: ipam.nddr.yndd.io/v1alpha1
 kind: IpamNetworkInstanceIpPrefix
 metadata:
-  name: default.default.isl-ipv6
-  namespace: nokia
+  name: isl-ipv6
+  namespace: default
 spec:
+  oda:  
+  - key: organization
+    value: nokia
+  ipam-name: nokia
+  network-instance-name: default
   ip-prefix:
     prefix: 3100:100::/48
     tag:

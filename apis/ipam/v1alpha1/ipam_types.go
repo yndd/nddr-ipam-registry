@@ -20,6 +20,7 @@ import (
 	"reflect"
 
 	nddv1 "github.com/yndd/ndd-runtime/apis/common/v1"
+	nddov1 "github.com/yndd/nddo-runtime/apis/common/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -42,16 +43,15 @@ type IpamIpam struct {
 
 // A IpamSpec defines the desired state of a Ipam.
 type IpamSpec struct {
-	//nddv1.ResourceSpec `json:",inline"`
-	Ipam *IpamIpam `json:"ipam,omitempty"`
+	nddov1.OdaInfo `json:",inline"`
+	Ipam           *IpamIpam `json:"ipam,omitempty"`
 }
 
 // A IpamStatus represents the observed state of a Ipam.
 type IpamStatus struct {
 	nddv1.ConditionedStatus `json:",inline"`
-	OrganizationName        *string       `json:"organization-name,omitempty"`
-	DeploymentName          *string       `json:"deployment-name,omitempty"`
-	IpamName                *string       `json:"ipam-name,omitempty"`
+	nddov1.OdaInfo          `json:",inline"`
+	RegistryName            *string       `json:"registry-name,omitempty"`
 	Ipam                    *NddrIpamIpam `json:"ipam,omitempty"`
 }
 
@@ -61,8 +61,9 @@ type IpamStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="SYNC",type="string",JSONPath=".status.conditions[?(@.kind=='Synced')].status"
 // +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.conditions[?(@.kind=='Ready')].status"
-// +kubebuilder:printcolumn:name="ORG",type="string",JSONPath=".status.organization-name"
-// +kubebuilder:printcolumn:name="DEPL",type="string",JSONPath=".status.deployment-name"
+// +kubebuilder:printcolumn:name="ORG",type="string",JSONPath=".status.oda[?(@.key=='organization')].value"
+// +kubebuilder:printcolumn:name="DEP",type="string",JSONPath=".status.oda[?(@.key=='deployment')].value"
+// +kubebuilder:printcolumn:name="AZ",type="string",JSONPath=".status.oda[?(@.key=='availability-zone')].value"
 // +kubebuilder:printcolumn:name="iPAM",type="string",JSONPath=".status.ipam-name"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 type Ipam struct {

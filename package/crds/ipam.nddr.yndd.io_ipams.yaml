@@ -1,5 +1,5 @@
 
-
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -23,11 +23,14 @@ spec:
     - jsonPath: .status.conditions[?(@.kind=='Ready')].status
       name: STATUS
       type: string
-    - jsonPath: .status.organization-name
+    - jsonPath: .status.oda[?(@.key=='organization')].value
       name: ORG
       type: string
-    - jsonPath: .status.deployment-name
-      name: DEPL
+    - jsonPath: .status.oda[?(@.key=='deployment')].value
+      name: DEP
+      type: string
+    - jsonPath: .status.oda[?(@.key=='availability-zone')].value
+      name: AZ
       type: string
     - jsonPath: .status.ipam-name
       name: iPAM
@@ -56,7 +59,7 @@ spec:
             description: A IpamSpec defines the desired state of a Ipam.
             properties:
               ipam:
-                description: nddv1.ResourceSpec `json:",inline"`
+                description: Ipam struct
                 properties:
                   admin-state:
                     default: enable
@@ -67,6 +70,15 @@ spec:
                   description:
                     type: string
                 type: object
+              oda:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
             type: object
           status:
             description: A IpamStatus represents the observed state of a Ipam.
@@ -104,8 +116,6 @@ spec:
                   - status
                   type: object
                 type: array
-              deployment-name:
-                type: string
               ipam:
                 description: NddrIpamIpam struct
                 properties:
@@ -399,9 +409,16 @@ spec:
                   vpc-name:
                     type: string
                 type: object
-              ipam-name:
-                type: string
-              organization-name:
+              oda:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
+              registry-name:
                 type: string
             type: object
         type: object

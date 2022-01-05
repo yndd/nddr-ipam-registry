@@ -61,16 +61,16 @@ type IpamIpamNetworkInstanceDefaultPrefixLength struct {
 
 // A IpamSpec defines the desired state of a Ipam.
 type IpamNetworkInstanceSpec struct {
-	//nddv1.ResourceSpec `json:",inline"`
+	nddov1.OdaInfo      `json:",inline"`
+	RegistryName        *string                  `json:"ipam-name"`
 	IpamNetworkInstance *IpamIpamNetworkInstance `json:"network-instance,omitempty"`
 }
 
 // A IpamStatus represents the observed state of a Ipam.
 type IpamNetworkInstanceStatus struct {
 	nddv1.ConditionedStatus `json:",inline"`
-	OrganizationName        *string                      `json:"organization-name,omitempty"`
-	DeploymentName          *string                      `json:"deployment-name,omitempty"`
-	IpamName                *string                      `json:"ipam-name,omitempty"`
+	nddov1.OdaInfo          `json:",inline"`
+	RegistryName            *string                      `json:"registry-name,omitempty"`
 	NetworkInstanceName     *string                      `json:"network-instance-name,omitempty"`
 	IpamNetworkInstance     *NddrIpamIpamNetworkInstance `json:"network-instance,omitempty"`
 }
@@ -81,9 +81,10 @@ type IpamNetworkInstanceStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="SYNC",type="string",JSONPath=".status.conditions[?(@.kind=='Synced')].status"
 // +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.conditions[?(@.kind=='Ready')].status"
-// +kubebuilder:printcolumn:name="ORG",type="string",JSONPath=".status.organization-name"
-// +kubebuilder:printcolumn:name="DEPL",type="string",JSONPath=".status.deployment-name"
-// +kubebuilder:printcolumn:name="IPAM",type="string",JSONPath=".status.ipam-name"
+// +kubebuilder:printcolumn:name="ORG",type="string",JSONPath=".status.oda[?(@.key=='organization')].value"
+// +kubebuilder:printcolumn:name="DEP",type="string",JSONPath=".status.oda[?(@.key=='deployment')].value"
+// +kubebuilder:printcolumn:name="AZ",type="string",JSONPath=".status.oda[?(@.key=='availability-zone')].value"
+// +kubebuilder:printcolumn:name="REGISTRY",type="string",JSONPath=".status.registry-name"
 // +kubebuilder:printcolumn:name="NI",type="string",JSONPath=".status.network-instance-name"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 type IpamNetworkInstance struct {

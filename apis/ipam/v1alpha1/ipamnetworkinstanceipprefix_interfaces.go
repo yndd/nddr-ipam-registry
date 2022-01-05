@@ -18,13 +18,11 @@ package v1alpha1
 
 import (
 	"reflect"
-	"strings"
 
 	nddv1 "github.com/yndd/ndd-runtime/apis/common/v1"
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	"github.com/yndd/ndd-runtime/pkg/utils"
 	nddov1 "github.com/yndd/nddo-runtime/apis/common/v1"
-	"github.com/yndd/nddo-runtime/pkg/odr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -53,8 +51,11 @@ type Ipp interface {
 	resource.Object
 	resource.Conditioned
 
-	GetOrganizationName() string
-	GetDeploymentName() string
+	GetCondition(ct nddv1.ConditionKind) nddv1.Condition
+	SetConditions(c ...nddv1.Condition)
+	GetOrganization() string
+	GetDeployment() string
+	GetAvailabilityZone() string
 	GetIpamName() string
 	GetNetworkInstanceName() string
 	GetIpPrefixName() string
@@ -69,12 +70,13 @@ type Ipp interface {
 	GetStatus() string
 	GetAllocatedPrefixes() uint32
 
-	SetAddressFamily(string)
-	SetOrganizationName(string)
-	SetDeploymentName(string)
+	SetOrganization(string)
+	SetDeployment(string)
+	SetAvailabilityZone(s string)
 	SetIpamName(string)
 	SetNetworkInstanceName(string)
 	SetIpPrefixName(string)
+	SetAddressFamily(string)
 }
 
 // GetCondition of this Network Node.
@@ -87,36 +89,33 @@ func (x *IpamNetworkInstanceIpPrefix) SetConditions(c ...nddv1.Condition) {
 	x.Status.SetConditions(c...)
 }
 
-func (x *IpamNetworkInstanceIpPrefix) GetOrganizationName() string {
-	return odr.GetOrganizationName(x.GetNamespace())
+func (x *IpamNetworkInstanceIpPrefix) GetOrganization() string {
+	return x.Spec.GetOrganization()
 }
 
-func (x *IpamNetworkInstanceIpPrefix) GetDeploymentName() string {
-	return odr.GetDeploymentName(x.GetNamespace())
+func (x *IpamNetworkInstanceIpPrefix) GetDeployment() string {
+	return x.Spec.GetDeployment()
+}
+
+func (x *IpamNetworkInstanceIpPrefix) GetAvailabilityZone() string {
+	return x.Spec.GetAvailabilityZone()
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetIpamName() string {
-	split := strings.Split(x.GetName(), ".")
-	if len(split) >= 3 {
-		return split[0]
+	if reflect.ValueOf(x.Spec.RegistryName).IsZero() {
+		return ""
 	}
-	return ""
+	return *x.Spec.RegistryName
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetNetworkInstanceName() string {
-	split := strings.Split(x.GetName(), ".")
-	if len(split) >= 3 {
-		return split[1]
+	if reflect.ValueOf(x.Spec.NetworkInstanceName).IsZero() {
+		return ""
 	}
-	return ""
+	return *x.Spec.NetworkInstanceName
 }
-
 func (x *IpamNetworkInstanceIpPrefix) GetIpPrefixName() string {
-	split := strings.Split(x.GetName(), ".")
-	if len(split) >= 3 {
-		return split[2]
-	}
-	return ""
+	return x.GetName()
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetIpPrefix() string {
@@ -218,16 +217,20 @@ func (x *IpamNetworkInstanceIpPrefix) GetAllocatedPrefixes() uint32 {
 	return 0
 }
 
-func (x *IpamNetworkInstanceIpPrefix) SetOrganizationName(s string) {
-	x.Status.OrganizationName = &s
+func (x *IpamNetworkInstanceIpPrefix) SetOrganization(s string) {
+	x.Status.SetOrganization(s)
 }
 
-func (x *IpamNetworkInstanceIpPrefix) SetDeploymentName(s string) {
-	x.Status.DeploymentName = &s
+func (x *IpamNetworkInstanceIpPrefix) SetDeployment(s string) {
+	x.Status.SetDeployment(s)
+}
+
+func (x *IpamNetworkInstanceIpPrefix) SetAvailabilityZone(s string) {
+	x.Status.SetAvailabilityZone(s)
 }
 
 func (x *IpamNetworkInstanceIpPrefix) SetIpamName(s string) {
-	x.Status.IpamName = &s
+	x.Status.RegistryName = &s
 }
 
 func (x *IpamNetworkInstanceIpPrefix) SetNetworkInstanceName(s string) {

@@ -1,8 +1,11 @@
 apiVersion: ipam.nddr.yndd.io/v1alpha1
 kind: Ipam
 metadata:
-  name: default
-  namespace: nokia
+  name: nokia
+  namespace: default
 spec:
+  oda:
+  - key: organization
+    value: nokia
   ipam:
     admin-state: enable

@@ -39,9 +39,6 @@ func (r *server) ResourceGet(ctx context.Context, req *resourcepb.Request) (*res
 func (r *server) ResourceRequest(ctx context.Context, req *resourcepb.Request) (*resourcepb.Reply, error) {
 	log := r.log.WithValues("Request", req)
 
-	namespace := req.GetNamespace()
-	registryName := strings.Split(req.GetResourceName(), ".")[0]
-
 	if _, ok := req.GetRequest().GetSelector()[ipamv1alpha1.KeyPurpose]; !ok {
 		return nil, errors.New("pupose not provided in resource request")
 	}
@@ -51,15 +48,16 @@ func (r *server) ResourceRequest(ctx context.Context, req *resourcepb.Request) (
 	}
 
 	registerInfo := &handler.RegisterInfo{
-		Namespace:     namespace,
-		RegistryName:  registryName,
-		RegisterName:  req.GetResourceName(),
-		CrName:        strings.Join([]string{namespace, registryName}, "."),
-		IpPrefix:      req.GetRequest().GetIpPrefix(),
-		Purpose:       req.GetRequest().GetSelector()[ipamv1alpha1.KeyPurpose],
-		AddressFamily: req.GetRequest().GetSelector()[ipamv1alpha1.KeyAddressFamily],
-		Selector:      req.GetRequest().GetSelector(),
-		SourceTag:     req.GetRequest().GetSourceTag(),
+		Namespace:           req.GetNamespace(),
+		RegistryName:        req.GetRegistryName(),
+		NetworkInstanceName: req.GetNetworkInstanceName(),
+		Name:                req.GetName(),
+		CrName:              strings.Join([]string{req.GetNamespace(), req.GetRegistryName(), req.GetNetworkInstanceName()}, "."),
+		IpPrefix:            req.GetRequest().GetIpPrefix(),
+		Purpose:             req.GetRequest().GetSelector()[ipamv1alpha1.KeyPurpose],
+		AddressFamily:       req.GetRequest().GetSelector()[ipamv1alpha1.KeyAddressFamily],
+		Selector:            req.GetRequest().GetSelector(),
+		SourceTag:           req.GetRequest().GetSourceTag(),
 	}
 
 	log.Debug("resource alloc", "registerInfo", registerInfo)
@@ -71,11 +69,13 @@ func (r *server) ResourceRequest(ctx context.Context, req *resourcepb.Request) (
 
 	// send a generic event to trigger a registry reconciliation based on a new allocation
 	// to update the status
-	r.eventChs[ipamv1alpha1.IpamGroupKind] <- event.GenericEvent{
-		Object: &ipamv1alpha1.Register{
-			ObjectMeta: metav1.ObjectMeta{Name: req.GetResourceName(), Namespace: namespace},
-		},
-	}
+	/*
+		r.eventChs[ipamv1alpha1.IpamGroupKind] <- event.GenericEvent{
+			Object: &ipamv1alpha1.Register{
+				ObjectMeta: metav1.ObjectMeta{Name: req.GetName(), Namespace: req.GetNamespace()},
+			},
+		}
+	*/
 
 	return &resourcepb.Reply{
 		Ready:      true,
@@ -91,15 +91,17 @@ func (r *server) ResourceRelease(ctx context.Context, req *resourcepb.Request) (
 	log := r.log.WithValues("Request", req)
 	log.Debug("ResourceDeAlloc...")
 
-	namespace := req.GetNamespace()
-	registryName := strings.Split(req.GetResourceName(), ".")[0]
-
 	registerInfo := &handler.RegisterInfo{
-		Namespace:    namespace,
-		RegistryName: registryName,
-		CrName:       strings.Join([]string{namespace, registryName}, "."),
-		Selector:     req.Request.Selector,
-		SourceTag:    req.Request.SourceTag,
+		Namespace:           req.GetNamespace(),
+		RegistryName:        req.GetRegistryName(),
+		NetworkInstanceName: req.GetNetworkInstanceName(),
+		Name:                req.GetName(),
+		CrName:              strings.Join([]string{req.GetNamespace(), req.GetRegistryName(), req.GetNetworkInstanceName()}, "."),
+		IpPrefix:            req.GetRequest().GetIpPrefix(),
+		Purpose:             req.GetRequest().GetSelector()[ipamv1alpha1.KeyPurpose],
+		AddressFamily:       req.GetRequest().GetSelector()[ipamv1alpha1.KeyAddressFamily],
+		Selector:            req.GetRequest().GetSelector(),
+		SourceTag:           req.GetRequest().GetSourceTag(),
 	}
 
 	log.Debug("resource dealloc", "registerInfo", registerInfo)
@@ -111,7 +113,7 @@ func (r *server) ResourceRelease(ctx context.Context, req *resourcepb.Request) (
 	// send a generic event to trigger a registry reconciliation based on a new DeAllocation
 	r.eventChs[ipamv1alpha1.IpamGroupKind] <- event.GenericEvent{
 		Object: &ipamv1alpha1.Register{
-			ObjectMeta: metav1.ObjectMeta{Name: req.GetResourceName(), Namespace: namespace},
+			ObjectMeta: metav1.ObjectMeta{Name: req.GetName(), Namespace: req.GetNamespace()},
 		},
 	}
 

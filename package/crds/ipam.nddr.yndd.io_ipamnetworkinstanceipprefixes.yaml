@@ -1,5 +1,5 @@
 
-
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -23,14 +23,17 @@ spec:
     - jsonPath: .status.conditions[?(@.kind=='Ready')].status
       name: STATUS
       type: string
-    - jsonPath: .status.organization-name
+    - jsonPath: .status.oda[?(@.key=='organization')].value
       name: ORG
       type: string
-    - jsonPath: .status.deployment-name
-      name: DEPL
+    - jsonPath: .status.oda[?(@.key=='deployment')].value
+      name: DEP
       type: string
-    - jsonPath: .status.ipam-name
-      name: IPAM
+    - jsonPath: .status.oda[?(@.key=='availability-zone')].value
+      name: AZ
+      type: string
+    - jsonPath: .status.registry-name
+      name: REGISTRY
       type: string
     - jsonPath: .status.network-instance-name
       name: NI
@@ -73,7 +76,7 @@ spec:
               of a IpamNetworkInstanceIpPrefix.
             properties:
               ip-prefix:
-                description: nddv1.ResourceSpec `json:",inline"`
+                description: IpamTenantNetworkInstanceIpPrefix struct
                 properties:
                   admin-state:
                     default: enable
@@ -101,6 +104,22 @@ spec:
                       type: object
                     type: array
                 type: object
+              ipam-name:
+                type: string
+              network-instance-name:
+                type: string
+              oda:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
+            required:
+            - ipam-name
+            - network-instance-name
             type: object
           status:
             description: A IpamNetworkInstanceIpPrefixStatus represents the observed
@@ -139,8 +158,6 @@ spec:
                   - status
                   type: object
                 type: array
-              deployment-name:
-                type: string
               ip-prefix:
                 description: NddrIpamIpamNetworkInstanceIpPrefix struct
                 properties:
@@ -218,11 +235,18 @@ spec:
                 type: object
               ip-prefix-name:
                 type: string
-              ipam-name:
-                type: string
               network-instance-name:
                 type: string
-              organization-name:
+              oda:
+                items:
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
+              registry-name:
                 type: string
             type: object
         type: object

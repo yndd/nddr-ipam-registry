@@ -177,8 +177,9 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.Ip) (m
 		cr.SetReason("")
 	}
 
-	cr.SetOrganizationName(cr.GetOrganizationName())
-	cr.SetDeploymentName(cr.GetDeploymentName())
+	cr.SetOrganization(cr.GetOrganization())
+	cr.SetDeployment(cr.GetDeployment())
+	cr.SetAvailabilityZone(cr.GetAvailabilityZone())
 	cr.SetIpamName(cr.GetIpamName())
 
 	// trick to use speedy for fast updates

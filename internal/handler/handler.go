@@ -42,15 +42,16 @@ func (r *handler) WithClient(c client.Client) {
 }
 
 type RegisterInfo struct {
-	Namespace     string
-	RegistryName  string
-	RegisterName  string
-	CrName        string
-	IpPrefix      string
-	Purpose       string
-	AddressFamily string
-	Selector      map[string]string
-	SourceTag     map[string]string
+	Namespace           string
+	Name                string
+	RegistryName        string
+	NetworkInstanceName string // only used in ipam
+	CrName              string
+	IpPrefix            string
+	Purpose             string
+	AddressFamily       string
+	Selector            map[string]string
+	SourceTag           map[string]string
 }
 
 type handler struct {
@@ -303,14 +304,13 @@ func (r *handler) validateRegister(ctx context.Context, info *RegisterInfo) (ipa
 	namespace := info.Namespace
 	//registryName := info.RegistryName
 	crName := info.CrName
-	registryName := info.RegistryName
-	networkInstanceName := strings.Split(info.RegisterName, ".")[1]
+	networkInstanceName := info.NetworkInstanceName
 
 	// find registry in k8s api
 	ni := r.newIpamNetworkInstance()
 	if err := r.client.Get(ctx, types.NamespacedName{
 		Namespace: namespace,
-		Name:      strings.Join([]string{registryName, networkInstanceName}, ".")}, ni); err != nil {
+		Name:      networkInstanceName}, ni); err != nil {
 		// can happen when the ipam is not found
 		r.log.Debug("networkInstance not found")
 		return nil, nil, errors.Wrap(err, "networkInstance not found")

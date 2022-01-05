@@ -52,16 +52,17 @@ type IpamIpamNetworkInstanceIpPrefix struct {
 
 // A IpamNetworkInstanceIpPrefixSpec defines the desired state of a IpamNetworkInstanceIpPrefix.
 type IpamNetworkInstanceIpPrefixSpec struct {
-	//nddv1.ResourceSpec `json:",inline"`
+	nddov1.OdaInfo              `json:",inline"`
+	RegistryName                *string                          `json:"ipam-name"`
+	NetworkInstanceName         *string                          `json:"network-instance-name"`
 	IpamNetworkInstanceIpPrefix *IpamIpamNetworkInstanceIpPrefix `json:"ip-prefix,omitempty"`
 }
 
 // A IpamNetworkInstanceIpPrefixStatus represents the observed state of a IpamNetworkInstanceIpPrefix.
 type IpamNetworkInstanceIpPrefixStatus struct {
 	nddv1.ConditionedStatus     `json:",inline"`
-	IpamName                    *string                              `json:"ipam-name,omitempty"`
-	OrganizationName            *string                              `json:"organization-name,omitempty"`
-	DeploymentName              *string                              `json:"deployment-name,omitempty"`
+	nddov1.OdaInfo              `json:",inline"`
+	RegistryName                *string                              `json:"registry-name,omitempty"`
 	NetworkInstanceName         *string                              `json:"network-instance-name,omitempty"`
 	IpPrefixName                *string                              `json:"ip-prefix-name,omitempty"`
 	IpamNetworkInstanceIpPrefix *NddrIpamIpamNetworkInstanceIpPrefix `json:"ip-prefix,omitempty"`
@@ -73,9 +74,10 @@ type IpamNetworkInstanceIpPrefixStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="SYNC",type="string",JSONPath=".status.conditions[?(@.kind=='Synced')].status"
 // +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.conditions[?(@.kind=='Ready')].status"
-// +kubebuilder:printcolumn:name="ORG",type="string",JSONPath=".status.organization-name"
-// +kubebuilder:printcolumn:name="DEPL",type="string",JSONPath=".status.deployment-name"
-// +kubebuilder:printcolumn:name="IPAM",type="string",JSONPath=".status.ipam-name"
+// +kubebuilder:printcolumn:name="ORG",type="string",JSONPath=".status.oda[?(@.key=='organization')].value"
+// +kubebuilder:printcolumn:name="DEP",type="string",JSONPath=".status.oda[?(@.key=='deployment')].value"
+// +kubebuilder:printcolumn:name="AZ",type="string",JSONPath=".status.oda[?(@.key=='availability-zone')].value"
+// +kubebuilder:printcolumn:name="REGISTRY",type="string",JSONPath=".status.registry-name"
 // +kubebuilder:printcolumn:name="NI",type="string",JSONPath=".status.network-instance-name"
 // +kubebuilder:printcolumn:name="PREFIX",type="string",JSONPath=".spec.ip-prefix.prefix"
 // +kubebuilder:printcolumn:name="AF",type="string",JSONPath=".status.ip-prefix.state.tag[?(@.key=='address-family')].value"

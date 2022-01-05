@@ -23,7 +23,6 @@ import (
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	"github.com/yndd/ndd-runtime/pkg/utils"
 	nddov1 "github.com/yndd/nddo-runtime/apis/common/v1"
-	"github.com/yndd/nddo-runtime/pkg/odr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -52,8 +51,11 @@ type Ip interface {
 	resource.Object
 	resource.Conditioned
 
-	GetOrganizationName() string
-	GetDeploymentName() string
+	GetCondition(ct nddv1.ConditionKind) nddv1.Condition
+	SetConditions(c ...nddv1.Condition)
+	GetOrganization() string
+	GetDeployment() string
+	GetAvailabilityZone() string
 	GetIpamName() string
 	GetAdminState() string
 	GetDescription() string
@@ -62,8 +64,9 @@ type Ip interface {
 	SetReason(string)
 	GetStatus() string
 
-	SetOrganizationName(string)
-	SetDeploymentName(string)
+	SetOrganization(string)
+	SetDeployment(string)
+	SetAvailabilityZone(s string)
 	SetIpamName(string)
 }
 
@@ -77,12 +80,16 @@ func (x *Ipam) SetConditions(c ...nddv1.Condition) {
 	x.Status.SetConditions(c...)
 }
 
-func (x *Ipam) GetOrganizationName() string {
-	return odr.GetOrganizationName(x.GetNamespace())
+func (x *Ipam) GetOrganization() string {
+	return x.Spec.GetOrganization()
 }
 
-func (x *Ipam) GetDeploymentName() string {
-	return odr.GetDeploymentName(x.GetNamespace())
+func (x *Ipam) GetDeployment() string {
+	return x.Spec.GetDeployment()
+}
+
+func (x *Ipam) GetAvailabilityZone() string {
+	return x.Spec.GetAvailabilityZone()
 }
 
 func (x *Ipam) GetIpamName() string {
@@ -139,14 +146,18 @@ func (x *Ipam) GetStatus() string {
 	return "unknown"
 }
 
-func (x *Ipam) SetOrganizationName(s string) {
-	x.Status.OrganizationName = &s
+func (x *Ipam) SetOrganization(s string) {
+	x.Status.SetOrganization(s)
 }
 
-func (x *Ipam) SetDeploymentName(s string) {
-	x.Status.DeploymentName = &s
+func (x *Ipam) SetDeployment(s string) {
+	x.Status.SetDeployment(s)
+}
+
+func (x *Ipam) SetAvailabilityZone(s string) {
+	x.Status.SetAvailabilityZone(s)
 }
 
 func (x *Ipam) SetIpamName(s string) {
-	x.Status.IpamName = &s
+	x.Status.RegistryName = &s
 }

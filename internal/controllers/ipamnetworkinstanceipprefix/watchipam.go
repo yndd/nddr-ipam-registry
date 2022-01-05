@@ -78,7 +78,9 @@ func (e *EnqueueRequestForAllIpams) add(obj runtime.Object, queue adder) {
 
 	for _, ipp := range d.GetIpPrefixes() {
 		// only enqueue if the org and/or deployment name match
-		if ipp.GetNamespace() == dd.GetNamespace() {
+		if ipp.GetOrganization() == dd.GetOrganization() &&
+			ipp.GetDeployment() == dd.GetDeployment() &&
+			ipp.GetIpamName() == dd.GetIpamName() {
 			crName := getCrName(ipp)
 			e.handler.ResetSpeedy(crName)
 

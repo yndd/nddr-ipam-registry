@@ -64,7 +64,7 @@ func (e *EnqueueRequestForAllIpamNetworkInstances) Generic(evt event.GenericEven
 }
 
 func (e *EnqueueRequestForAllIpamNetworkInstances) add(obj runtime.Object, queue adder) {
-	dd, ok := obj.(*ipamv1alpha1.Ipam)
+	dd, ok := obj.(*ipamv1alpha1.IpamNetworkInstance)
 	if !ok {
 		return
 	}
@@ -78,7 +78,10 @@ func (e *EnqueueRequestForAllIpamNetworkInstances) add(obj runtime.Object, queue
 
 	for _, ipp := range d.GetIpPrefixes() {
 		// only enqueue if the org and/or deployment name match
-		if ipp.GetNamespace() == dd.GetNamespace() {
+		if ipp.GetOrganization() == dd.GetOrganization() &&
+			ipp.GetDeployment() == dd.GetDeployment() &&
+			ipp.GetIpamName() == dd.GetIpamName() &&
+			ipp.GetNetworkInstanceName() == dd.GetNetworkInstanceName() {
 			crName := getCrName(ipp)
 			e.handler.ResetSpeedy(crName)
 

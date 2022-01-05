@@ -142,13 +142,14 @@ func (r *application) Delete(ctx context.Context, mg resource.Managed) (bool, er
 
 	if prefix, ok := cr.HasIpPrefix(); ok {
 		registerInfo := &handler.RegisterInfo{
-			Namespace:    cr.GetNamespace(),
-			RegistryName: cr.GetIpamName(),
-			RegisterName: cr.GetName(),
-			CrName:       getCrName(cr),
-			IpPrefix:     prefix,
-			Selector:     cr.GetSelector(),
-			SourceTag:    cr.GetSourceTag(),
+			Namespace:           cr.GetNamespace(),
+			RegistryName:        cr.GetIpamName(),
+			Name:                cr.GetName(),
+			NetworkInstanceName: cr.GetNetworkInstanceName(),
+			CrName:              getCrName(cr),
+			IpPrefix:            prefix,
+			Selector:            cr.GetSelector(),
+			SourceTag:           cr.GetSourceTag(),
 		}
 
 		log.Debug("resource dealloc", "registerInfo", registerInfo)
@@ -169,8 +170,6 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.Rr) (m
 	log := r.log.WithValues("function", "handleAppLogic", "crname", cr.GetName())
 	log.Debug("handleAppLogic")
 
-	crName := getCrName(cr)
-
 	selector := cr.GetSelector()
 	if _, ok := selector[ipamv1alpha1.KeyPurpose]; !ok {
 		return nil, errors.New("pupose not provided in resource request")
@@ -181,15 +180,16 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.Rr) (m
 	}
 
 	registerInfo := &handler.RegisterInfo{
-		Namespace:     cr.GetNamespace(),
-		RegistryName:  cr.GetIpamName(),
-		RegisterName:  cr.GetName(),
-		CrName:        crName,
-		Purpose:       selector[ipamv1alpha1.KeyPurpose],
-		AddressFamily: selector[ipamv1alpha1.KeyAddressFamily],
-		IpPrefix:      cr.GetIpPrefix(),
-		Selector:      selector,
-		SourceTag:     cr.GetSourceTag(),
+		Namespace:           cr.GetNamespace(),
+		RegistryName:        cr.GetIpamName(),
+		NetworkInstanceName: cr.GetNetworkInstanceName(),
+		Name:                cr.GetName(),
+		CrName:              getCrName(cr),
+		Purpose:             selector[ipamv1alpha1.KeyPurpose],
+		AddressFamily:       selector[ipamv1alpha1.KeyAddressFamily],
+		IpPrefix:            cr.GetIpPrefix(),
+		Selector:            selector,
+		SourceTag:           cr.GetSourceTag(),
 	}
 
 	log.Debug("resource alloc", "registerInfo", registerInfo)
@@ -201,8 +201,9 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.Rr) (m
 
 	cr.SetIpPrefix(*ipPrefix)
 
-	cr.SetOrganizationName(cr.GetOrganizationName())
-	cr.SetDeploymentName(cr.GetDeploymentName())
+	cr.SetOrganization(cr.GetOrganization())
+	cr.SetDeployment(cr.GetDeployment())
+	cr.SetAvailabilityZone(cr.GetAvailabilityZone())
 	cr.SetIpamName(cr.GetIpamName())
 	cr.SetNetworkInstanceName(cr.GetNetworkInstanceName())
 

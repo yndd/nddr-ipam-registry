@@ -17,11 +17,9 @@ package v1alpha1
 
 import (
 	"reflect"
-	"strings"
 
 	nddv1 "github.com/yndd/ndd-runtime/apis/common/v1"
 	"github.com/yndd/ndd-runtime/pkg/resource"
-	"github.com/yndd/nddo-runtime/pkg/odr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -52,8 +50,9 @@ type Rr interface {
 
 	GetCondition(ct nddv1.ConditionKind) nddv1.Condition
 	SetConditions(c ...nddv1.Condition)
-	GetOrganizationName() string
-	GetDeploymentName() string
+	GetOrganization() string
+	GetDeployment() string
+	GetAvailabilityZone() string
 	GetIpamName() string
 	GetNetworkInstanceName() string
 	GetIpPrefix() string
@@ -63,8 +62,9 @@ type Rr interface {
 	GetSelector() map[string]string
 	SetIpPrefix(p string)
 	HasIpPrefix() (string, bool)
-	SetOrganizationName(string)
-	SetDeploymentName(string)
+	SetOrganization(string)
+	SetDeployment(string)
+	SetAvailabilityZone(s string)
 	SetIpamName(string)
 	SetNetworkInstanceName(string)
 }
@@ -79,77 +79,70 @@ func (x *Register) SetConditions(c ...nddv1.Condition) {
 	x.Status.SetConditions(c...)
 }
 
-func (x *Register) GetOrganizationName() string {
-	return odr.GetOrganizationName(x.GetNamespace())
+func (x *Register) GetOrganization() string {
+	return x.Spec.GetOrganization()
 }
 
-func (x *Register) GetDeploymentName() string {
-	return odr.GetDeploymentName(x.GetNamespace())
+func (x *Register) GetDeployment() string {
+	return x.Spec.GetOrganization()
+}
+
+func (x *Register) GetAvailabilityZone() string {
+	return x.Spec.GetAvailabilityZone()
 }
 
 func (x *Register) GetIpamName() string {
-	split := strings.Split(x.GetName(), ".")
-	if len(split) > 2 {
-		return split[0]
+	if reflect.ValueOf(x.Spec.RegistryName).IsZero() {
+		return ""
 	}
-	return ""
+	return *x.Spec.RegistryName
 }
 
 func (x *Register) GetNetworkInstanceName() string {
-	split := strings.Split(x.GetName(), ".")
-	if len(split) > 2 {
-		return split[1]
-	}
-	return ""
-}
-
-func (n *Register) GetIpPrefix() string {
-	if reflect.ValueOf(n.Spec.Register.IpPrefix).IsZero() {
+	if reflect.ValueOf(x.Spec.NetworkInstanceName).IsZero() {
 		return ""
 	}
-	return *n.Spec.Register.IpPrefix
+	return *x.Spec.NetworkInstanceName
 }
 
-/*
-func (n *Register) GetPrefixLength() *uint32 {
-	if reflect.ValueOf(n.Spec.Register.PrefixLength).IsZero() {
-		return nil
+func (x *Register) GetIpPrefix() string {
+	if reflect.ValueOf(x.Spec.Register.IpPrefix).IsZero() {
+		return ""
 	}
-	return n.Spec.Register.PrefixLength
+	return *x.Spec.Register.IpPrefix
 }
-*/
 
-func (n *Register) GetAddressFamily() string {
-	if reflect.ValueOf(n.Spec.Register.AddressFamily).IsZero() {
+func (x *Register) GetAddressFamily() string {
+	if reflect.ValueOf(x.Spec.Register.AddressFamily).IsZero() {
 		return "ipv4"
 	}
-	return *n.Spec.Register.AddressFamily
+	return *x.Spec.Register.AddressFamily
 }
 
-func (n *Register) GetSourceTag() map[string]string {
+func (x *Register) GetSourceTag() map[string]string {
 	s := make(map[string]string)
-	if reflect.ValueOf(n.Spec.Register.SourceTag).IsZero() {
+	if reflect.ValueOf(x.Spec.Register.SourceTag).IsZero() {
 		return s
 	}
-	for _, tag := range n.Spec.Register.SourceTag {
+	for _, tag := range x.Spec.Register.SourceTag {
 		s[*tag.Key] = *tag.Value
 	}
 	return s
 }
 
-func (n *Register) GetSelector() map[string]string {
+func (x *Register) GetSelector() map[string]string {
 	s := make(map[string]string)
-	if reflect.ValueOf(n.Spec.Register.Selector).IsZero() {
+	if reflect.ValueOf(x.Spec.Register.Selector).IsZero() {
 		return s
 	}
-	for _, tag := range n.Spec.Register.Selector {
+	for _, tag := range x.Spec.Register.Selector {
 		s[*tag.Key] = *tag.Value
 	}
 	return s
 }
 
-func (n *Register) SetIpPrefix(p string) {
-	n.Status = RegisterStatus{
+func (x *Register) SetIpPrefix(p string) {
+	x.Status = RegisterStatus{
 		Register: &NddrIpamRegister{
 			State: &NddrRegisterState{
 				IpPrefix: &p,
@@ -158,26 +151,30 @@ func (n *Register) SetIpPrefix(p string) {
 	}
 }
 
-func (n *Register) HasIpPrefix() (string, bool) {
-	if n.Status.Register != nil && n.Status.Register.State != nil && n.Status.Register.State.IpPrefix != nil {
-		return *n.Status.Register.State.IpPrefix, true
+func (x *Register) HasIpPrefix() (string, bool) {
+	if x.Status.Register != nil && x.Status.Register.State != nil && x.Status.Register.State.IpPrefix != nil {
+		return *x.Status.Register.State.IpPrefix, true
 	}
 	return "", false
 
 }
 
-func (n *Register) SetOrganizationName(s string) {
-	n.Status.OrganizationName = &s
+func (x *Register) SetOrganization(s string) {
+	x.Status.SetOrganization(s)
 }
 
-func (n *Register) SetDeploymentName(s string) {
-	n.Status.DeploymentName = &s
+func (x *Register) SetDeployment(s string) {
+	x.Status.SetDeployment(s)
 }
 
-func (n *Register) SetIpamName(s string) {
-	n.Status.IpamName = &s
+func (x *Register) SetAvailabilityZone(s string) {
+	x.Status.SetAvailabilityZone(s)
 }
 
-func (n *Register) SetNetworkInstanceName(s string) {
-	n.Status.NetworkInstanceName = &s
+func (x *Register) SetIpamName(s string) {
+	x.Status.RegistryName = &s
+}
+
+func (x *Register) SetNetworkInstanceName(s string) {
+	x.Status.NetworkInstanceName = &s
 }

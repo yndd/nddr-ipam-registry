@@ -1,9 +1,13 @@
 apiVersion: ipam.nddr.yndd.io/v1alpha1
 kind: IpamNetworkInstance
 metadata:
-  name: default.default
-  namespace: nokia
+  name: nokia
+  namespace: default
 spec:
+  oda:  
+  - key: organization
+    value: nokia
+  ipam-name: nokia
   network-instance:
     admin-state: enable
     description: "default network instance"

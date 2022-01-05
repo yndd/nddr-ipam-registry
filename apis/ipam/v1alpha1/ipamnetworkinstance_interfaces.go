@@ -18,13 +18,11 @@ package v1alpha1
 
 import (
 	"reflect"
-	"strings"
 
 	nddv1 "github.com/yndd/ndd-runtime/apis/common/v1"
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	"github.com/yndd/ndd-runtime/pkg/utils"
 	nddov1 "github.com/yndd/nddo-runtime/apis/common/v1"
-	"github.com/yndd/nddo-runtime/pkg/odr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -53,8 +51,11 @@ type In interface {
 	resource.Object
 	resource.Conditioned
 
-	GetOrganizationName() string
-	GetDeploymentName() string
+	GetCondition(ct nddv1.ConditionKind) nddv1.Condition
+	SetConditions(c ...nddv1.Condition)
+	GetOrganization() string
+	GetDeployment() string
+	GetAvailabilityZone() string
 	GetIpamName() string
 	GetNetworkInstanceName() string
 	GetAdminState() string
@@ -67,8 +68,9 @@ type In interface {
 	SetReason(string)
 	GetStatus() string
 
-	SetOrganizationName(string)
-	SetDeploymentName(string)
+	SetOrganization(string)
+	SetDeployment(string)
+	SetAvailabilityZone(s string)
 	SetIpamName(string)
 	SetNetworkInstanceName(string)
 }
@@ -83,28 +85,24 @@ func (x *IpamNetworkInstance) SetConditions(c ...nddv1.Condition) {
 	x.Status.SetConditions(c...)
 }
 
-func (x *IpamNetworkInstance) GetOrganizationName() string {
-	return odr.GetOrganizationName(x.GetNamespace())
+func (x *IpamNetworkInstance) GetOrganization() string {
+	return x.Spec.GetOrganization()
 }
 
-func (x *IpamNetworkInstance) GetDeploymentName() string {
-	return odr.GetDeploymentName(x.GetNamespace())
+func (x *IpamNetworkInstance) GetDeployment() string {
+	return x.Spec.GetDeployment()
+}
+
+func (x *IpamNetworkInstance) GetAvailabilityZone() string {
+	return x.Spec.GetAvailabilityZone()
 }
 
 func (x *IpamNetworkInstance) GetIpamName() string {
-	split := strings.Split(x.GetName(), ".")
-	if len(split) >= 2 {
-		return split[0]
-	}
-	return ""
+	return *x.Spec.RegistryName
 }
 
 func (x *IpamNetworkInstance) GetNetworkInstanceName() string {
-	split := strings.Split(x.GetName(), ".")
-	if len(split) >= 2 {
-		return split[1]
-	}
-	return ""
+	return x.GetName()
 }
 
 func (x *IpamNetworkInstance) GetAdminState() string {
@@ -199,16 +197,20 @@ func (x *IpamNetworkInstance) GetStatus() string {
 	return "unknown"
 }
 
-func (x *IpamNetworkInstance) SetOrganizationName(s string) {
-	x.Status.OrganizationName = &s
+func (x *IpamNetworkInstance) SetOrganization(s string) {
+	x.Status.SetOrganization(s)
 }
 
-func (x *IpamNetworkInstance) SetDeploymentName(s string) {
-	x.Status.DeploymentName = &s
+func (x *IpamNetworkInstance) SetDeployment(s string) {
+	x.Status.SetDeployment(s)
+}
+
+func (x *IpamNetworkInstance) SetAvailabilityZone(s string) {
+	x.Status.SetAvailabilityZone(s)
 }
 
 func (x *IpamNetworkInstance) SetIpamName(s string) {
-	x.Status.IpamName = &s
+	x.Status.RegistryName = &s
 }
 
 func (x *IpamNetworkInstance) SetNetworkInstanceName(s string) {
