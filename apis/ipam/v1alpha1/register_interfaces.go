@@ -20,6 +20,7 @@ import (
 
 	nddv1 "github.com/yndd/ndd-runtime/apis/common/v1"
 	"github.com/yndd/ndd-runtime/pkg/resource"
+	"github.com/yndd/nddo-runtime/pkg/odns"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -80,29 +81,23 @@ func (x *Register) SetConditions(c ...nddv1.Condition) {
 }
 
 func (x *Register) GetOrganization() string {
-	return x.Spec.GetOrganization()
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetOrganization()
 }
 
 func (x *Register) GetDeployment() string {
-	return x.Spec.GetOrganization()
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetDeployment()
 }
 
 func (x *Register) GetAvailabilityZone() string {
-	return x.Spec.GetAvailabilityZone()
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetAvailabilityZone()
 }
 
 func (x *Register) GetIpamName() string {
-	if reflect.ValueOf(x.Spec.RegistryName).IsZero() {
-		return ""
-	}
-	return *x.Spec.RegistryName
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetRegistryName()
 }
 
 func (x *Register) GetNetworkInstanceName() string {
-	if reflect.ValueOf(x.Spec.NetworkInstanceName).IsZero() {
-		return ""
-	}
-	return *x.Spec.NetworkInstanceName
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetNetworkInstanceName()
 }
 
 func (x *Register) GetIpPrefix() string {

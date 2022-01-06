@@ -24,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/yndd/ndd-runtime/pkg/event"
 	"github.com/yndd/ndd-runtime/pkg/logging"
+	"github.com/yndd/nddo-runtime/pkg/odns"
 	"github.com/yndd/nddo-runtime/pkg/reconciler/managed"
 	"github.com/yndd/nddo-runtime/pkg/resource"
 	ipamv1alpha1 "github.com/yndd/nddr-ipam-registry/apis/ipam/v1alpha1"
@@ -182,7 +183,7 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.Rr) (m
 	registerInfo := &handler.RegisterInfo{
 		Namespace:           cr.GetNamespace(),
 		RegistryName:        cr.GetIpamName(),
-		NetworkInstanceName: cr.GetNetworkInstanceName(),
+		NetworkInstanceName: odns.GetParentResourceName(cr.GetName()),
 		Name:                cr.GetName(),
 		CrName:              getCrName(cr),
 		Purpose:             selector[ipamv1alpha1.KeyPurpose],

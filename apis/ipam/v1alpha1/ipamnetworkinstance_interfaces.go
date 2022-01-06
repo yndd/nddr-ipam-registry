@@ -23,6 +23,7 @@ import (
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	"github.com/yndd/ndd-runtime/pkg/utils"
 	nddov1 "github.com/yndd/nddo-runtime/apis/common/v1"
+	"github.com/yndd/nddo-runtime/pkg/odns"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -86,23 +87,23 @@ func (x *IpamNetworkInstance) SetConditions(c ...nddv1.Condition) {
 }
 
 func (x *IpamNetworkInstance) GetOrganization() string {
-	return x.Spec.GetOrganization()
+	return odns.Name2OdnsRegistry(x.GetName()).GetOrganization()
 }
 
 func (x *IpamNetworkInstance) GetDeployment() string {
-	return x.Spec.GetDeployment()
+	return odns.Name2OdnsRegistry(x.GetName()).GetDeployment()
 }
 
 func (x *IpamNetworkInstance) GetAvailabilityZone() string {
-	return x.Spec.GetAvailabilityZone()
+	return odns.Name2OdnsRegistry(x.GetName()).GetAvailabilityZone()
 }
 
 func (x *IpamNetworkInstance) GetIpamName() string {
-	return *x.Spec.RegistryName
+	return odns.Name2OdnsRegistry(x.GetName()).GetRegistryName()
 }
 
 func (x *IpamNetworkInstance) GetNetworkInstanceName() string {
-	return x.GetName()
+	return odns.Name2OdnsRegistry(x.GetName()).GetResourceName()
 }
 
 func (x *IpamNetworkInstance) GetAdminState() string {

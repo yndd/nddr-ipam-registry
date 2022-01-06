@@ -76,7 +76,8 @@ spec:
               of a IpamNetworkInstanceIpPrefix.
             properties:
               ip-prefix:
-                description: IpamTenantNetworkInstanceIpPrefix struct
+                description: nddov1.OdaInfo              `json:",inline"` RegistryName                *string                          `json:"ipam-name"`
+                  NetworkInstanceName         *string                          `json:"network-instance-name"`
                 properties:
                   admin-state:
                     default: enable
@@ -104,22 +105,6 @@ spec:
                       type: object
                     type: array
                 type: object
-              ipam-name:
-                type: string
-              network-instance-name:
-                type: string
-              oda:
-                items:
-                  properties:
-                    key:
-                      type: string
-                    value:
-                      type: string
-                  type: object
-                type: array
-            required:
-            - ipam-name
-            - network-instance-name
             type: object
           status:
             description: A IpamNetworkInstanceIpPrefixStatus represents the observed

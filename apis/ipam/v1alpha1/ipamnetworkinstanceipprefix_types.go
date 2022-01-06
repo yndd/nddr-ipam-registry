@@ -52,9 +52,9 @@ type IpamIpamNetworkInstanceIpPrefix struct {
 
 // A IpamNetworkInstanceIpPrefixSpec defines the desired state of a IpamNetworkInstanceIpPrefix.
 type IpamNetworkInstanceIpPrefixSpec struct {
-	nddov1.OdaInfo              `json:",inline"`
-	RegistryName                *string                          `json:"ipam-name"`
-	NetworkInstanceName         *string                          `json:"network-instance-name"`
+	//nddov1.OdaInfo              `json:",inline"`
+	//RegistryName                *string                          `json:"ipam-name"`
+	//NetworkInstanceName         *string                          `json:"network-instance-name"`
 	IpamNetworkInstanceIpPrefix *IpamIpamNetworkInstanceIpPrefix `json:"ip-prefix,omitempty"`
 }
 

@@ -23,6 +23,7 @@ import (
 	"github.com/yndd/ndd-runtime/pkg/resource"
 	"github.com/yndd/ndd-runtime/pkg/utils"
 	nddov1 "github.com/yndd/nddo-runtime/apis/common/v1"
+	"github.com/yndd/nddo-runtime/pkg/odns"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -90,32 +91,27 @@ func (x *IpamNetworkInstanceIpPrefix) SetConditions(c ...nddv1.Condition) {
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetOrganization() string {
-	return x.Spec.GetOrganization()
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetOrganization()
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetDeployment() string {
-	return x.Spec.GetDeployment()
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetDeployment()
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetAvailabilityZone() string {
-	return x.Spec.GetAvailabilityZone()
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetAvailabilityZone()
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetIpamName() string {
-	if reflect.ValueOf(x.Spec.RegistryName).IsZero() {
-		return ""
-	}
-	return *x.Spec.RegistryName
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetRegistryName()
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetNetworkInstanceName() string {
-	if reflect.ValueOf(x.Spec.NetworkInstanceName).IsZero() {
-		return ""
-	}
-	return *x.Spec.NetworkInstanceName
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetNetworkInstanceName()
 }
+
 func (x *IpamNetworkInstanceIpPrefix) GetIpPrefixName() string {
-	return x.GetName()
+	return odns.Name2OdnsRegistryNi(x.GetName()).GetResourceName()
 }
 
 func (x *IpamNetworkInstanceIpPrefix) GetIpPrefix() string {

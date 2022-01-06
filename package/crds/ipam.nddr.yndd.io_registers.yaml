@@ -62,19 +62,9 @@ spec:
           spec:
             description: A RegisterSpec defines the desired state of a Register.
             properties:
-              network-instance-name:
-                type: string
-              oda:
-                items:
-                  properties:
-                    key:
-                      type: string
-                    value:
-                      type: string
-                  type: object
-                type: array
               register:
-                description: IpamRegister struct
+                description: nddov1.OdaInfo      `json:",inline"` RegistryName        *string       `json:"registry-name,omitempty"`
+                  NetworkInstanceName *string       `json:"network-instance-name,omitempty"`
                 properties:
                   address-family:
                     default: ipv4
@@ -105,8 +95,6 @@ spec:
                       type: object
                     type: array
                 type: object
-              registry-name:
-                type: string
             type: object
           status:
             description: A RegisterStatus represents the observed state of a Register.

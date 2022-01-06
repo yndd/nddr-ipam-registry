@@ -199,6 +199,7 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.In) (m
 
 	//organizationName := cr.GetOrganizationName()
 	// get the deployment
+	log.Debug("IpamName", "ipamname", cr.GetIpamName())
 	ipam := r.newIpam()
 	if err := r.client.Get(ctx, types.NamespacedName{
 		Namespace: cr.GetNamespace(),

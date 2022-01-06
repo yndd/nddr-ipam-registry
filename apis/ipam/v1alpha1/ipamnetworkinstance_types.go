@@ -61,8 +61,8 @@ type IpamIpamNetworkInstanceDefaultPrefixLength struct {
 
 // A IpamSpec defines the desired state of a Ipam.
 type IpamNetworkInstanceSpec struct {
-	nddov1.OdaInfo      `json:",inline"`
-	RegistryName        *string                  `json:"ipam-name"`
+	//nddov1.OdaInfo      `json:",inline"`
+	//RegistryName        *string                  `json:"ipam-name"`
 	IpamNetworkInstance *IpamIpamNetworkInstance `json:"network-instance,omitempty"`
 }
 

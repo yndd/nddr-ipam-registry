@@ -78,7 +78,7 @@ func (e *EnqueueRequestForAllIpams) add(obj runtime.Object, queue adder) {
 
 	for _, ni := range d.GetNetworkInstances() {
 		// only enqueue if the org and/or deployment name match
-		if ni.GetNamespace() == dd.GetNamespace() {
+		if ni.GetIpamName() == dd.GetIpamName() {
 			crName := getCrName(ni)
 			e.handler.ResetSpeedy(crName)
 

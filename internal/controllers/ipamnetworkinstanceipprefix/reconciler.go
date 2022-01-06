@@ -24,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/yndd/ndd-runtime/pkg/event"
 	"github.com/yndd/ndd-runtime/pkg/logging"
+	"github.com/yndd/nddo-runtime/pkg/odns"
 	"github.com/yndd/nddo-runtime/pkg/reconciler/managed"
 	"github.com/yndd/nddo-runtime/pkg/resource"
 	ipamv1alpha1 "github.com/yndd/nddr-ipam-registry/apis/ipam/v1alpha1"
@@ -219,11 +220,12 @@ func (r *application) handleAppLogic(ctx context.Context, cr ipamv1alpha1.Ipp) (
 	log := r.log.WithValues("function", "handleAppLogic", "crname", cr.GetName())
 	log.Debug("handleAppLogic")
 
+	fullNiName := odns.GetParentResourceName(cr.GetName())
 	// get the ni
 	ni := r.newIpamNetworkInstance()
 	if err := r.client.Get(ctx, types.NamespacedName{
 		Namespace: cr.GetNamespace(),
-		Name:      cr.GetNetworkInstanceName(),
+		Name:      fullNiName,
 	}, ni); err != nil {
 		// can happen when the deployment is not found
 		cr.SetStatus("down")

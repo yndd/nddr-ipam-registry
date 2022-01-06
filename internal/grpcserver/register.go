@@ -23,6 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/yndd/nddo-grpc/resource/resourcepb"
+	"github.com/yndd/nddo-runtime/pkg/odns"
 	ipamv1alpha1 "github.com/yndd/nddr-ipam-registry/apis/ipam/v1alpha1"
 	"github.com/yndd/nddr-ipam-registry/internal/handler"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,7 +51,7 @@ func (r *server) ResourceRequest(ctx context.Context, req *resourcepb.Request) (
 	registerInfo := &handler.RegisterInfo{
 		Namespace:           req.GetNamespace(),
 		RegistryName:        req.GetRegistryName(),
-		NetworkInstanceName: req.GetNetworkInstanceName(),
+		NetworkInstanceName: odns.GetParentResourceName(req.GetName()),
 		Name:                req.GetName(),
 		CrName:              strings.Join([]string{req.GetNamespace(), req.GetRegistryName(), req.GetNetworkInstanceName()}, "."),
 		IpPrefix:            req.GetRequest().GetIpPrefix(),
@@ -64,6 +65,7 @@ func (r *server) ResourceRequest(ctx context.Context, req *resourcepb.Request) (
 
 	prefix, err := r.handler.Register(ctx, registerInfo)
 	if err != nil {
+		log.Debug("resource alloc", "error", err)
 		return &resourcepb.Reply{Ready: false}, err
 	}
 

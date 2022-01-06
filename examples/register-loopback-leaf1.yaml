@@ -1,14 +1,9 @@
 apiVersion: ipam.nddr.yndd.io/v1alpha1
 kind: Register
 metadata:
-  name: alloc-loopback-leaf1
+  name: nokia.region1.infra.ipam-default.default-routed.alloc-loopback-leaf1
   namespace: default
 spec:
-  oda:  
-  - key: organization
-    value: nokia
-  registry-name: nokia
-  network-instance-name: default
   register:
     selector:
     - key: purpose
