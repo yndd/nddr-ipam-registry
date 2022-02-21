@@ -313,16 +313,16 @@ func (r *handler) validateRegister(ctx context.Context, info *RegisterInfo) (ipa
 		Name:      networkInstanceName}, ni); err != nil {
 		// can happen when the ipam is not found
 		r.log.Debug("networkInstance not found")
-		return nil, nil, errors.Wrap(err, "networkInstance not found")
+		return nil, nil, fmt.Errorf("networkInstance not found: %s", networkInstanceName)
 	}
 
 	// check is registry is ready
 	if ni.GetCondition(ipamv1alpha1.ConditionKindReady).Status != corev1.ConditionTrue {
-		return nil, nil, errors.New("networkInstance not ready")
+		return nil, nil, fmt.Errorf("networkInstance not ready: %s", networkInstanceName)
 	}
 
 	if _, ok := r.iptree[crName]; !ok {
-		return nil, nil, errors.New("networkInstance iptree not ready")
+		return nil, nil, fmt.Errorf("networkInstance iptree not ready: %s", crName)
 	}
 
 	// check if the pool/register is ready to handle new registrations

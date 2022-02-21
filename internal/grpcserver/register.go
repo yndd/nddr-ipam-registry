@@ -48,12 +48,14 @@ func (r *server) ResourceRequest(ctx context.Context, req *resourcepb.Request) (
 		return nil, errors.New("af not provided in resource request")
 	}
 
+	odnsRegisteryNi := odns.Name2OdnsRegistryNi(req.RegisterName)
+
 	registerInfo := &handler.RegisterInfo{
 		Namespace:           req.GetNamespace(),
-		RegistryName:        req.GetRegistryName(),
-		NetworkInstanceName: odns.GetParentResourceName(req.GetName()),
-		Name:                req.GetName(),
-		CrName:              strings.Join([]string{req.GetNamespace(), req.GetRegistryName(), req.GetNetworkInstanceName()}, "."),
+		RegistryName:        odnsRegisteryNi.GetRegistryName(),
+		NetworkInstanceName: odns.GetParentResourceName(req.GetRegisterName()),
+		Name:                req.GetRegisterName(),
+		CrName:              strings.Join([]string{req.GetNamespace(), odnsRegisteryNi.GetRegistryName(), odnsRegisteryNi.GetNetworkInstanceName()}, "."),
 		IpPrefix:            req.GetRequest().GetIpPrefix(),
 		Purpose:             req.GetRequest().GetSelector()[ipamv1alpha1.KeyPurpose],
 		AddressFamily:       req.GetRequest().GetSelector()[ipamv1alpha1.KeyAddressFamily],
@@ -93,12 +95,14 @@ func (r *server) ResourceRelease(ctx context.Context, req *resourcepb.Request) (
 	log := r.log.WithValues("Request", req)
 	log.Debug("ResourceDeAlloc...")
 
+	odnsRegisteryNi := odns.Name2OdnsRegistryNi(req.RegisterName)
+
 	registerInfo := &handler.RegisterInfo{
 		Namespace:           req.GetNamespace(),
-		RegistryName:        req.GetRegistryName(),
-		NetworkInstanceName: req.GetNetworkInstanceName(),
-		Name:                req.GetName(),
-		CrName:              strings.Join([]string{req.GetNamespace(), req.GetRegistryName(), req.GetNetworkInstanceName()}, "."),
+		RegistryName:        odnsRegisteryNi.GetRegistryName(),
+		NetworkInstanceName: odns.GetParentResourceName(req.GetRegisterName()),
+		Name:                req.GetRegisterName(),
+		CrName:              strings.Join([]string{req.GetNamespace(), odnsRegisteryNi.GetRegistryName(), odnsRegisteryNi.GetNetworkInstanceName()}, "."),
 		IpPrefix:            req.GetRequest().GetIpPrefix(),
 		Purpose:             req.GetRequest().GetSelector()[ipamv1alpha1.KeyPurpose],
 		AddressFamily:       req.GetRequest().GetSelector()[ipamv1alpha1.KeyAddressFamily],
@@ -115,7 +119,7 @@ func (r *server) ResourceRelease(ctx context.Context, req *resourcepb.Request) (
 	// send a generic event to trigger a registry reconciliation based on a new DeAllocation
 	r.eventChs[ipamv1alpha1.IpamGroupKind] <- event.GenericEvent{
 		Object: &ipamv1alpha1.Register{
-			ObjectMeta: metav1.ObjectMeta{Name: req.GetName(), Namespace: req.GetNamespace()},
+			ObjectMeta: metav1.ObjectMeta{Name: req.GetRegisterName(), Namespace: req.GetNamespace()},
 		},
 	}
 

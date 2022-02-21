@@ -8,8 +8,8 @@ require (
 	github.com/spf13/cobra v1.2.1
 	github.com/yndd/ndd-core v0.1.6
 	github.com/yndd/ndd-runtime v0.1.6
-	github.com/yndd/nddo-grpc v0.0.16
-	github.com/yndd/nddo-runtime v0.0.54
+	github.com/yndd/nddo-grpc v0.0.17
+	github.com/yndd/nddo-runtime v0.0.60
 	github.com/yndd/nddr-org-registry v0.0.8
 	google.golang.org/grpc v1.42.0
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e

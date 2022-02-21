@@ -146,7 +146,7 @@ func (r *application) Delete(ctx context.Context, mg resource.Managed) (bool, er
 			Namespace:           cr.GetNamespace(),
 			RegistryName:        cr.GetIpamName(),
 			Name:                cr.GetName(),
-			NetworkInstanceName: cr.GetNetworkInstanceName(),
+			NetworkInstanceName: odns.GetParentResourceName(cr.GetName()),
 			CrName:              getCrName(cr),
 			IpPrefix:            prefix,
 			Selector:            cr.GetSelector(),
